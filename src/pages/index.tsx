@@ -65,8 +65,9 @@ export default function Home() {
       </section>
       </div>
 
-      {/* Product Catalog */}
-     <ProductCatalog view={view} />
+     {/* Product Catalog */}
+<ProductCatalog view={view} sort={sort} />
+
 
 
 

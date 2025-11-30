@@ -82,13 +82,17 @@ export default function ProductDetail() {
   ].filter((img) => !!img.url) as { label: string; url: string }[];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       {/* Breadcrumbs */}
-      <div className="max-w-7xl mx-auto px-4 py-4 text-sm flex space-x-2 text-gray-500">
-        <span>
-          <Link href="/" className="hover:underline text-gray-400">Products</Link> /
-        </span>
-        <span className="text-blue-600 font-medium">{product.name}</span>
+      <div className="max-w-7xl mx-auto px-4 py-4 text-sm flex items-center space-x-2">
+        <Link
+          href="/"
+          className="text-gray-500 hover:text-blue-500 transition-colors"
+        >
+          Products
+        </Link>
+        <span className="text-gray-400">/</span>
+        <span className="text-amber-600 font-medium">{product.name}</span>
       </div>
 
       {/* Main Product Section */}

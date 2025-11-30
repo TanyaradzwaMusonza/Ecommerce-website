@@ -7,9 +7,11 @@ import { useRouter } from "next/router";
 
 interface ProductCatalogProps {
   view: "grid" | "list";
+  sort: string; // <- accept sort from Home
 }
 
 interface Product {
+  created_at: string | number | Date;
   id: string;
   name: string;
   description?: string;
@@ -22,7 +24,7 @@ interface Product {
   reviews?: number;
 }
 
-const ProductCatalog: React.FC<ProductCatalogProps> = ({ view }) => {
+const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
   const supabase = createPagesBrowserClient();
   const router = useRouter();
 
@@ -35,8 +37,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view }) => {
   const [selectedRating, setSelectedRating] = useState(0);
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
 
-  // Sorting
-  const [sort, setSort] = useState("Top Rated");
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -76,10 +76,12 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view }) => {
   }, [selectedCategory, selectedSubcategory, selectedRating, showAvailableOnly]);
 
   // Sorting
+   // Sort products based on prop from Home
   const sortedProducts = [...products];
   if (sort === "Price: Low to High") sortedProducts.sort((a, b) => a.price - b.price);
   if (sort === "Price: High to Low") sortedProducts.sort((a, b) => b.price - a.price);
   if (sort === "Top Rated") sortedProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  if (sort === "Newest") sortedProducts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   const totalPages = Math.ceil(sortedProducts.length / pageSize);
   const currentProducts = sortedProducts.slice(page * pageSize, page * pageSize + pageSize);
@@ -95,6 +97,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view }) => {
   };
 
   if (loading) return <p className="text-center text-gray-500 mt-6">Loading products...</p>;
+
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-4 lg:p-8">

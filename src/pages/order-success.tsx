@@ -15,32 +15,33 @@ export default function OrderSuccess() {
   const [confettiActive, setConfettiActive] = useState(false);
 
   useEffect(() => {
-    // Get window size for confetti
+    if (!router.isReady) return;
+
+    if (!orderId) {
+      router.push("/");
+      return;
+    }
+
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
 
-    // Sequential animation
     const sequence = async () => {
-      // 1️⃣ Show tick
       setTickVisible(true);
-      await new Promise(r => setTimeout(r, 700));
+      await new Promise((r) => setTimeout(r, 700));
 
-      // 2️⃣ Activate confetti
       setConfettiActive(true);
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 500));
 
-      // 3️⃣ Show text
       setTextVisible(true);
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise((r) => setTimeout(r, 300));
 
-      // 4️⃣ Show button
       setButtonVisible(true);
     };
+
     sequence();
-  }, []);
+  }, [router.isReady, orderId]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 relative overflow-hidden">
-      {/* Confetti */}
       {confettiActive && (
         <Confetti
           width={windowSize.width}
@@ -51,7 +52,6 @@ export default function OrderSuccess() {
         />
       )}
 
-      {/* Tick */}
       <div
         className={`w-32 h-32 rounded-full flex items-center justify-center mb-6 bg-green-100 text-green-600 transition-all duration-700 transform ${
           tickVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
@@ -60,23 +60,30 @@ export default function OrderSuccess() {
         <FaCheck className="text-6xl animate-bounce" />
       </div>
 
-      {/* Text */}
       <h1
         className={`text-4xl font-bold text-green-600 mb-2 transition-all duration-700 transform ${
           textVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
         }`}
       >
-        Order Successful! <br></br> 
+        Order Successful!
       </h1>
+
       <p
-        className={`text-gray-700 mb-6 text-center transition-all duration-700 transform ${
+        className={`text-gray-700 mb-2 text-center transition-all duration-700 transform ${
           textVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
         }`}
       >
         Your order ID: <strong>{orderId}</strong>
       </p>
 
-      {/* Button */}
+      <p
+        className={`text-gray-500 mb-6 text-center transition-all duration-700 transform ${
+          textVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"
+        }`}
+      >
+        Thank you for trusting us🙂!
+      </p>
+
       {buttonVisible && (
         <button
           onClick={() => router.push("/account/order/page")}
