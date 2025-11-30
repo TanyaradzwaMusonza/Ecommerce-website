@@ -26,8 +26,8 @@ export default function Home() {
       {/* View + Sort Controls */}
       <section className="  max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-between items-center">
         {/* View Controls */}
-        <div className="flex items-center space-x-2 -ml-9">
-          <span className="font-semibold mr-2 text-gray-800">View:</span>
+        <div className="flex items-center space-x-2 -ml-9  hidden sm:flex">
+          <span className="font-semibold mr-2 text-gray-800 ">View:</span>
           <button
             className={`flex items-center px-3 py-1 rounded space-x-1 ${
               view === "grid" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
@@ -49,8 +49,8 @@ export default function Home() {
         </div>
 
         {/* Sort Dropdown */}
-        <div className="flex items-center space-x-2">
-          <span className="font-semibold text-gray-800">Sort by:</span>
+        <div className="flex  items-center  space-x-2">
+          <span className="font-semibold text-gray-800 -ml-5">Sort by:</span>
           <select
             className="border px-2 py-1 rounded text-gray-500"
             value={sort}
