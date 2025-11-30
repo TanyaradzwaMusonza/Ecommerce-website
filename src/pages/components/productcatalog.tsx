@@ -100,7 +100,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
 
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-4 lg:p-8">
+    <div className="flex flex-col lg:flex-row gap-6 p-4 lg:p-8 overflow-y-auto">
       {/* Mobile Filter Button */}
       <div className="lg:hidden mb-4">
         <button
