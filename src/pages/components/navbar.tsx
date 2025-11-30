@@ -33,12 +33,16 @@ const Navbar: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
+  // Only search via button click
   const handleSearchSubmit = () => {
     if (searchQuery.trim() === "") return;
+
+    // Example: navigate to product catalog with query
     router.push({
       pathname: "/productcatalog",
       query: { search: searchQuery.trim() },
     });
+
     setSearchQuery("");
     setMobileMenuOpen(false);
   };
@@ -79,7 +83,7 @@ const Navbar: React.FC = () => {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="Search products..."
-                onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
+                // Enter key does nothing
                 className="border rounded-full py-1 px-3 w-48 focus:outline-none focus:ring-2 focus:ring-amber-700 transition bg-white/50 backdrop-blur-sm"
               />
               <FaSearch
@@ -144,7 +148,6 @@ const Navbar: React.FC = () => {
 
           {/* Mobile Hamburger + Cart */}
           <div className="md:hidden flex items-center space-x-4">
-            {/* Cart */}
             <Link href="/cart" className="relative">
               <FaShoppingCart size={24} className="text-amber-700" />
               {totalQuantity > 0 && (
@@ -154,7 +157,6 @@ const Navbar: React.FC = () => {
               )}
             </Link>
 
-            {/* Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
               className="text-blue-600 hover:text-blue-800 transition"
@@ -180,10 +182,13 @@ const Navbar: React.FC = () => {
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search products..."
-              onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
+              // Enter key does nothing
               className="border rounded-full py-2 px-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition bg-white/50 backdrop-blur-sm"
             />
-            <button onClick={handleSearchSubmit} className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            <button
+              onClick={handleSearchSubmit} // only search via button
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            >
               Search
             </button>
           </div>
@@ -192,7 +197,16 @@ const Navbar: React.FC = () => {
           <button onClick={handleAdminClick} className="w-full text-left px-4 py-2 hover:bg-blue-100 rounded">Admin</button>
           <Link href="/about" className="block px-4 py-2 hover:bg-amber-400 rounded">About</Link>
           <Link href="/contact" className="block px-4 py-2 hover:bg-amber-400 rounded">Contact</Link>
-          {!user && <Link href="/auth/login" className="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-amber-400 text-center">Get Started</Link>}
+
+          {!user && (
+            <Link
+              href="/auth/login"
+              className="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-amber-400 text-center"
+            >
+              Get Started
+            </Link>
+          )}
+
           {user && (
             <>
               <Link href="/components/profile" className="block px-4 py-2 hover:bg-blue-100 rounded">My Profile</Link>

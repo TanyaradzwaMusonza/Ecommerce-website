@@ -1,3 +1,4 @@
+
 // components/PageWrapper.tsx
 import Navbar from "./navbar";
 import Footer from "./footer";
