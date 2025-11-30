@@ -73,14 +73,14 @@ const Navbar: React.FC = () => {
             <Link href="/contact" className="hover:text-blue-500 transition">Contact</Link>
 
             {/* Search */}
-            <div className="relative ">
+            <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="Search products..."
                 onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
-                className="border rounded-full py-1 px-3 w-48 focus:outline-none  focus:ring-2 focus:ring-amber-700 transition bg-white/50 backdrop-blur-sm"
+                className="border rounded-full py-1 px-3 w-48 focus:outline-none focus:ring-2 focus:ring-amber-700 transition bg-white/50 backdrop-blur-sm"
               />
               <FaSearch
                 className="absolute right-2 top-1.5 text-gray-500 cursor-pointer"
@@ -142,8 +142,19 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile Hamburger */}
-          <div className="md:hidden">
+          {/* Mobile Hamburger + Cart */}
+          <div className="md:hidden flex items-center space-x-4">
+            {/* Cart */}
+            <Link href="/cart" className="relative">
+              <FaShoppingCart size={24} className="text-amber-700" />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {totalQuantity}
+                </span>
+              )}
+            </Link>
+
+            {/* Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
               className="text-blue-600 hover:text-blue-800 transition"
@@ -177,10 +188,10 @@ const Navbar: React.FC = () => {
             </button>
           </div>
 
-          <Link href="/" className="block px-4 py-2  hover:bg-amber-400 rounded">Home</Link>
+          <Link href="/" className="block px-4 py-2 hover:bg-amber-400 rounded">Home</Link>
           <button onClick={handleAdminClick} className="w-full text-left px-4 py-2 hover:bg-blue-100 rounded">Admin</button>
           <Link href="/about" className="block px-4 py-2 hover:bg-amber-400 rounded">About</Link>
-          <Link href="/contact" className="block px-4 py-2  hover:bg-amber-400 rounded">Contact</Link>
+          <Link href="/contact" className="block px-4 py-2 hover:bg-amber-400 rounded">Contact</Link>
           {!user && <Link href="/auth/login" className="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-amber-400 text-center">Get Started</Link>}
           {user && (
             <>
