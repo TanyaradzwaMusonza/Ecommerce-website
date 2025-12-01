@@ -159,7 +159,7 @@ const Navbar: React.FC = () => {
 
             <button
               onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-blue-600 hover:text-blue-800 transition"
+              className="text-amber-600 hover:text-amber-800 transition"
             >
               {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
