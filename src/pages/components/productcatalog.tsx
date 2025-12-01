@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/router";
 
 interface ProductCatalogProps {
   view: "grid" | "list";
-  sort: string; // <- accept sort from Home
+  sort: string;
+  searchQuery?: string;
 }
 
 interface Product {
@@ -25,9 +24,8 @@ interface Product {
   reviews?: number;
 }
 
-const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
+const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery }) => {
   const supabase = createPagesBrowserClient();
-  const router = useRouter();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +35,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [selectedRating, setSelectedRating] = useState(0);
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
-
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -57,16 +54,22 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
     { name: "Toys & Games", subs: ["Children's toys", "Board games", "Puzzles"] },
   ];
 
+  // Fetch products from Supabase
   const fetchProducts = async () => {
     setLoading(true);
     let query = supabase.from("products").select("*");
+
+    // Category filters
     if (selectedCategory !== "All Categories") query = query.eq("category", selectedCategory);
     if (selectedSubcategory) query = query.eq("subcategory", selectedSubcategory);
     if (showAvailableOnly) query = query.gt("stock", 0);
     if (selectedRating > 0) query = query.gte("rating", selectedRating);
+
     const { data, error } = await query;
+
     if (error) console.error("Supabase fetch error:", error);
     else setProducts(data || []);
+
     setLoading(false);
   };
 
@@ -76,9 +79,20 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
     setDirection(0);
   }, [selectedCategory, selectedSubcategory, selectedRating, showAvailableOnly]);
 
+  // Derived filtered products
+  const filteredProducts = products.filter((p) => {
+    if (!searchQuery || searchQuery.trim() === "") return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.name.toLowerCase().includes(q) ||
+      (p.description && p.description.toLowerCase().includes(q)) ||
+      p.category.toLowerCase().includes(q) ||
+      p.subcategory.toLowerCase().includes(q)
+    );
+  });
+
   // Sorting
-   // Sort products based on prop from Home
-  const sortedProducts = [...products];
+  const sortedProducts = [...filteredProducts];
   if (sort === "Price: Low to High") sortedProducts.sort((a, b) => a.price - b.price);
   if (sort === "Price: High to Low") sortedProducts.sort((a, b) => b.price - a.price);
   if (sort === "Top Rated") sortedProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -98,7 +112,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
   };
 
   if (loading) return <p className="text-center text-gray-500 mt-6">Loading products...</p>;
-
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-4 lg:p-8 overflow-y-auto">
@@ -125,7 +138,10 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
               className={`w-full text-left py-2 px-3 rounded-lg font-semibold ${
                 selectedCategory === "All Categories" ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
               }`}
-              onClick={() => { setSelectedCategory("All Categories"); setSelectedSubcategory(null); }}
+              onClick={() => {
+                setSelectedCategory("All Categories");
+                setSelectedSubcategory(null);
+              }}
             >
               All Categories
             </button>
@@ -147,7 +163,10 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
                         className={`w-full text-left py-1 px-3 rounded-lg ${
                           selectedSubcategory === sub ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
                         }`}
-                        onClick={() => { setSelectedCategory(cat.name); setSelectedSubcategory(sub); }}
+                        onClick={() => {
+                          setSelectedCategory(cat.name);
+                          setSelectedSubcategory(sub);
+                        }}
                       >
                         {sub}
                       </button>
@@ -200,25 +219,23 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
                   <img
                     src={p.image_url || "/placeholder.png"}
                     alt={p.name}
-                    className={`object-cover ${view === "list" ? "w-full sm:w-48 h-48 sm:h-full" : "w-full h-48"} cursor-pointer`}
+                    className={`object-cover ${
+                      view === "list" ? "w-full sm:w-48 h-48 sm:h-full" : "w-full h-48"
+                    } cursor-pointer`}
                   />
                 </Link>
                 <div className="p-4 flex flex-col justify-between flex-1">
                   <div className="space-y-1">
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {router.query.search ? (
-                        <>
-                          {p.name.split(new RegExp(`(${router.query.search})`, "gi")).map((part, idx) =>
-                            part.toLowerCase() === (router.query.search as string).toLowerCase() ? (
+                      {searchQuery
+                        ? p.name.split(new RegExp(`(${searchQuery})`, "gi")).map((part, idx) =>
+                            part.toLowerCase() === searchQuery.toLowerCase() ? (
                               <span key={idx} className="bg-yellow-200">{part}</span>
                             ) : (
                               <span key={idx}>{part}</span>
                             )
-                          )}
-                        </>
-                      ) : (
-                        p.name
-                      )}
+                          )
+                        : p.name}
                     </h2>
                     <p className="text-gray-600 text-sm">{p.description}</p>
                     <p className="text-blue-600 font-bold mt-1">${p.price}</p>
@@ -254,7 +271,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort }) => {
                 />
               ))}
             </div>
-
             <div className="flex gap-2 ml-auto">
               <button onClick={() => goToPage(-1)} className="p-2 bg-white rounded-full shadow">
                 <ChevronLeft />
