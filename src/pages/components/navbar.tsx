@@ -209,7 +209,7 @@ const Navbar: React.FC = () => {
 
           {user && (
             <>
-              <Link href="/components/profile" className="block px-4 py-2 hover:bg-blue-100 rounded">My Profile</Link>
+              <Link href="/account/order/page" className="block px-4 py-2 hover:bg-blue-100 rounded">My Orders</Link>
               <button
                 className="w-full text-left px-4 py-2 hover:bg-blue-100 rounded"
                 onClick={async () => {
