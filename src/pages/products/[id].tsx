@@ -190,14 +190,14 @@ export default function ProductDetail() {
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 lg:px-8 py-12">
-          <h2 className="text-2xl font-bold mb-6">Related Products</h2>
+          <h2 className="text-2xl font-bold mb-6 text-amber-600">Related Products</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {relatedProducts.map((p) => (
               <Link key={p.id} href={`/products/${p.id}`}>
                 <div className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition bg-white">
                   <img src={p.image_url} alt={p.name} className="w-full h-48 object-cover" />
                   <div className="p-3 text-sm">
-                    <p className="font-semibold">{p.name}</p>
+                    <p className="font-semibold text-black">{p.name}</p>
                     <p className="text-blue-600 font-bold">${p.price}</p>
                   </div>
                 </div>

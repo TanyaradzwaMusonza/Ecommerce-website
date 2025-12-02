@@ -68,12 +68,12 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-black bg-gradient-to-tr from-indigo-50 via-blue-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center text-black bg-linear-to-tr from-indigo-50 via-blue-50 to-purple-50 px-4">
       <div className="max-w-5xl w-full rounded-3xl overflow-hidden shadow-2xl bg-white/80 backdrop-blur-md flex flex-col md:flex-row">
         {/* Left illustration */}
-        <div className="hidden md:flex w-1/2 bg-gradient-to-br from-blue-500 to-purple-500 relative justify-center items-center">
+        <div className="hidden md:flex w-1/2 bg-linear-to-br from-blue-500 to-purple-500 relative justify-center items-center">
           <h1 className="absolute text-white text-4xl font-bold p-4 text-center drop-shadow-lg">
-            Welcome to ShopEase 2025
+            Welcome to <br></br> <span className="italic text-amber-600">RoshShop</span>
           </h1>
           <img
             src="https://images.pexels.com/photos/102129/pexels-photo-102129.jpeg"
