@@ -59,7 +59,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
     setLoading(true);
     let query = supabase.from("products").select("*");
 
-    // Category filters
     if (selectedCategory !== "All Categories") query = query.eq("category", selectedCategory);
     if (selectedSubcategory) query = query.eq("subcategory", selectedSubcategory);
     if (showAvailableOnly) query = query.gt("stock", 0);
@@ -79,7 +78,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
     setDirection(0);
   }, [selectedCategory, selectedSubcategory, selectedRating, showAvailableOnly]);
 
-  // Derived filtered products
   const filteredProducts = products.filter((p) => {
     if (!searchQuery || searchQuery.trim() === "") return true;
     const q = searchQuery.toLowerCase();
@@ -91,7 +89,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
     );
   });
 
-  // Sorting
   const sortedProducts = [...filteredProducts];
   if (sort === "Price: Low to High") sortedProducts.sort((a, b) => a.price - b.price);
   if (sort === "Price: High to Low") sortedProducts.sort((a, b) => b.price - a.price);
@@ -109,6 +106,22 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
       if (next >= totalPages) return 0;
       return next;
     });
+  };
+
+  // Mobile pagination dots logic
+  const getVisibleDots = () => {
+    const maxDots = 5;
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      if (totalPages <= maxDots) return Array.from({ length: totalPages }, (_, i) => i);
+      let start = Math.max(0, page - 2);
+      let end = start + maxDots;
+      if (end > totalPages) {
+        end = totalPages;
+        start = end - maxDots;
+      }
+      return Array.from({ length: end - start }, (_, i) => i + start);
+    }
+    return Array.from({ length: totalPages }, (_, i) => i);
   };
 
   if (loading) return <p className="text-center text-gray-500 mt-6">Loading products...</p>;
@@ -178,7 +191,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
           ))}
         </ul>
 
-        {/* Availability */}
         <div>
           <h3 className="text-xl font-bold mb-2 text-black">Availability</h3>
           <label className="flex items-center space-x-2">
@@ -263,7 +275,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
         {totalPages > 1 && (
           <div className="relative mt-6 flex justify-end items-center">
             <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-2">
-              {Array.from({ length: totalPages }).map((_, idx) => (
+              {getVisibleDots().map((idx) => (
                 <span
                   key={idx}
                   className={`w-3 h-3 rounded-full cursor-pointer ${idx === page ? "bg-blue-600" : "bg-gray-300"}`}
@@ -271,6 +283,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
                 />
               ))}
             </div>
+
             <div className="flex gap-2 ml-auto">
               <button onClick={() => goToPage(-1)} className="p-2 bg-white rounded-full shadow">
                 <ChevronLeft />
