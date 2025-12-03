@@ -4,6 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/router";
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ const Navbar: React.FC = () => {
 
   const { cartItems } = useCart();
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.qty, 0);
 
@@ -35,7 +37,6 @@ const Navbar: React.FC = () => {
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
 
-    // If cleared, reset products immediately
     if (e.target.value === "") {
       dispatchSearchEvent("");
     }
@@ -113,7 +114,17 @@ const Navbar: React.FC = () => {
                 {isAccountDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white/90 backdrop-blur-md shadow-lg rounded-md py-2 z-50">
                     <Link href="/account/order/page" className="block px-4 py-2 hover:bg-blue-100 rounded" onClick={() => setAccountDropdownOpen(false)}>My Orders</Link>
-                    <button className="block w-full text-left px-4 py-2 text-red-600 hover:bg-blue-100 rounded" onClick={async () => { await supabase.auth.signOut(); setUser(null); setAccountDropdownOpen(false); }}>Sign Out</button>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-blue-100 rounded"
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        setUser(null);
+                        setAccountDropdownOpen(false);
+                        router.push("/"); // <-- redirect to home
+                      }}
+                    >
+                      Sign Out
+                    </button>
                   </div>
                 )}
               </div>
@@ -161,7 +172,17 @@ const Navbar: React.FC = () => {
           {user && (
             <>
               <Link href="/account/order/page" className="block px-4 py-2 hover:bg-blue-100 rounded">My Orders</Link>
-              <button className="w-full text-left px-4 py-2 hover:bg-blue-100 rounded" onClick={async () => { await supabase.auth.signOut(); setUser(null); setMobileMenuOpen(false); }}>Sign Out</button>
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-blue-100 rounded"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setUser(null);
+                  setMobileMenuOpen(false);
+                  router.push("/"); // <-- redirect to home
+                }}
+              >
+                Sign Out
+              </button>
             </>
           )}
         </motion.div>

@@ -1,4 +1,3 @@
-// pages/api/auth/forgot-password.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/lib/supabase";
 
@@ -9,8 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!email) return res.status(400).json({ message: "Email required" });
 
   // Send password reset email
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-password`
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/resetpassword`,
   });
 
   if (error) return res.status(400).json({ message: error.message });

@@ -1,21 +1,17 @@
 // pages/auth.tsx
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function AuthPage() {
   const supabase = useSupabaseClient();
   const router = useRouter();
-  const { type } = router.query as { type?: string };
 
-  const [mode, setMode] = useState<"login" | "signup" | "reset" | "new-password">(
-    type === "reset" ? "reset" : "login"
-  );
+  const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -23,7 +19,7 @@ export default function AuthPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setMessage(error.message);
     else router.push("/checkout");
   };
@@ -32,7 +28,7 @@ export default function AuthPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name } },
@@ -41,39 +37,24 @@ export default function AuthPage() {
     else setMessage("Check your email to confirm signup.");
   };
 
-  // PASSWORD RESET REQUEST
+  // FORGOT PASSWORD REQUEST
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth?type=new-password`,
+      redirectTo: `${window.location.origin}/resetpassword`,
     });
     if (error) setMessage(error.message);
     else setMessage("Check your email for reset instructions");
   };
 
-  // PASSWORD RESET CONFIRMATION
-  const handleNewPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage("");
-    if (!newPassword) return setMessage("New password required");
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) setMessage(error.message);
-    else {
-      setMessage("Password reset successful! You can now login.");
-      setMode("login");
-      setPassword("");
-      setNewPassword("");
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center text-black bg-linear-to-tr from-indigo-50 via-blue-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-50 via-blue-50 to-purple-50 px-4 text-black">
       <div className="max-w-5xl w-full rounded-3xl overflow-hidden shadow-2xl bg-white/80 backdrop-blur-md flex flex-col md:flex-row">
         {/* Left illustration */}
-        <div className="hidden md:flex w-1/2 bg-linear-to-br from-blue-500 to-purple-500 relative justify-center items-center">
+        <div className="hidden md:flex w-1/2 bg-gradient-to-br from-blue-500 to-purple-500 relative justify-center items-center">
           <h1 className="absolute text-white text-4xl font-bold p-4 text-center drop-shadow-lg">
-            Welcome to <br></br> <span className="italic text-amber-600">RoshShop</span>
+            Welcome to <br /> <span className="italic text-amber-600">RoshShop</span>
           </h1>
           <img
             src="https://images.pexels.com/photos/102129/pexels-photo-102129.jpeg"
@@ -85,21 +66,17 @@ export default function AuthPage() {
         {/* Right form */}
         <div className="w-full md:w-1/2 p-10 flex flex-col justify-center relative">
           {/* Toggle tabs */}
-          {mode !== "reset" && mode !== "new-password" && (
+          {mode !== "reset" && (
             <div className="flex justify-center mb-8 space-x-8">
               <button
                 onClick={() => { setMode("login"); setMessage(""); }}
-                className={`pb-2 text-lg font-semibold ${
-                  mode === "login" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 border-b-2 border-transparent hover:text-blue-400"
-                }`}
+                className={`pb-2 text-lg font-semibold ${mode === "login" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 border-b-2 border-transparent hover:text-blue-400"}`}
               >
                 Login
               </button>
               <button
                 onClick={() => { setMode("signup"); setMessage(""); }}
-                className={`pb-2 text-lg font-semibold ${
-                  mode === "signup" ? "text-purple-600 border-b-2 border-purple-600" : "text-gray-400 border-b-2 border-transparent hover:text-purple-400"
-                }`}
+                className={`pb-2 text-lg font-semibold ${mode === "signup" ? "text-purple-600 border-b-2 border-purple-600" : "text-gray-400 border-b-2 border-transparent hover:text-purple-400"}`}
               >
                 Sign Up
               </button>
@@ -165,7 +142,7 @@ export default function AuthPage() {
                 required
               />
               <input
-                type={password ? "text" : "password"}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
@@ -193,26 +170,6 @@ export default function AuthPage() {
                 </button>
                 <button className="py-3 px-6 bg-blue-600 text-white rounded-2xl">Send Reset Link</button>
               </div>
-            </form>
-          )}
-
-          {mode === "new-password" && (
-            <form onSubmit={handleNewPassword} className="space-y-5">
-              <h2 className="text-xl font-bold text-center">Set New Password</h2>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="New Password"
-                className="w-full px-5 py-3 rounded-2xl border border-gray-300"
-                required
-              />
-              <div className="text-right mt-2">
-                <button type="button" onClick={() => { setMode("login"); setMessage(""); }} className="text-sm text-gray-500 hover:underline">
-                  Back to Login
-                </button>
-              </div>
-              <button className="w-full py-3 bg-green-600 text-white rounded-2xl">Reset Password</button>
             </form>
           )}
         </div>
