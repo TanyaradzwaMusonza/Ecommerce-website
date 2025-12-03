@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* ShopHub Branding */}
           <div className="space-y-4">
-            <h2 className="text-white text-2xl font-bold">ShopHub</h2>
+            <h2 className="text-amber-600 text-2xl font-bold">RoshShop</h2>
             <p className="text-sm leading-relaxed max-w-xs">
               Your trusted destination for premium products at unbeatable prices. Shop with confidence and style.
             </p>
@@ -64,7 +64,7 @@ export default function Footer() {
 
         {/* Bottom Section */}
         <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-400">© 2023 ShopHub. All rights reserved.</p>
+          <p className="text-sm text-gray-400">© 2025 RoshShop. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="#" className="text-sm text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</Link>
             <Link href="#" className="text-sm text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</Link>
