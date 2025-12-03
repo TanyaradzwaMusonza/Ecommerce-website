@@ -30,19 +30,29 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [selectedRating, setSelectedRating] = useState(0);
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
 
-  // Pagination
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(view === "list" ? 5 : 9);
+  const [pageSize] = useState(view === "list" ? 5 : 9);
   const [direction, setDirection] = useState(0);
 
-  // Mobile filter toggle
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Detect mobile vs desktop
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const updateDevice = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    updateDevice();
+    window.addEventListener("resize", updateDevice);
+    return () => window.removeEventListener("resize", updateDevice);
+  }, []);
 
   const categories = [
     { name: "Electronics", subs: ["Phones", "Laptops", "Audio", "Smart Home"] },
@@ -54,7 +64,6 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
     { name: "Toys & Games", subs: ["Children's toys", "Board games", "Puzzles"] },
   ];
 
-  // Fetch products from Supabase
   const fetchProducts = async () => {
     setLoading(true);
     let query = supabase.from("products").select("*");
@@ -108,26 +117,32 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
     });
   };
 
-  // Mobile pagination dots logic
+  // -----------------------------
+  // UPDATED PAGINATION DOTS LOGIC
+  // -----------------------------
   const getVisibleDots = () => {
-    const maxDots = 5;
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      if (totalPages <= maxDots) return Array.from({ length: totalPages }, (_, i) => i);
-      let start = Math.max(0, page - 2);
-      let end = start + maxDots;
-      if (end > totalPages) {
-        end = totalPages;
-        start = end - maxDots;
-      }
-      return Array.from({ length: end - start }, (_, i) => i + start);
+    const maxDots = isMobile ? 5 : 6;
+
+    if (totalPages <= maxDots) {
+      return Array.from({ length: totalPages }, (_, i) => i);
     }
-    return Array.from({ length: totalPages }, (_, i) => i);
+
+    let start = Math.max(0, page - Math.floor(maxDots / 2));
+    let end = start + maxDots;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = end - maxDots;
+    }
+
+    return Array.from({ length: end - start }, (_, i) => start + i);
   };
 
   if (loading) return <p className="text-center text-gray-500 mt-6">Loading products...</p>;
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-4 lg:p-8 overflow-y-auto">
+
       {/* Mobile Filter Button */}
       <div className="lg:hidden mb-4">
         <button
@@ -159,6 +174,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({ view, sort, searchQuery
               All Categories
             </button>
           </li>
+
           {categories.map((cat) => (
             <li key={cat.name}>
               <details>
